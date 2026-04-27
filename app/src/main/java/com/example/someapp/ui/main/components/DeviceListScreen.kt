@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,7 +20,19 @@ internal fun DeviceListScreen(
   devices: List<DeviceWithType>,
   modifier: Modifier = Modifier,
 ) {
-  Scaffold() {paddingValues ->
+  Scaffold(modifier,
+    floatingActionButton = {
+      BottomSheetTrigger(
+        trigger = { onClick ->
+          androidx.compose.material3.FloatingActionButton(onClick = onClick) {
+            Text("+")
+          }
+        },
+        sheetContent = {
+          Text("Add your device content here")
+        }
+      )
+    }) {paddingValues ->
     Column(modifier = Modifier
       .padding(paddingValues)
       .padding(horizontal = 8.dp),) {
