@@ -4,6 +4,7 @@ import com.example.someapp.data.local.dao.DeviceDao
 import com.example.someapp.data.local.dao.DeviceTypeDao
 import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceTypeEntity
+import com.example.someapp.data.local.entity.DeviceWithType
 import kotlinx.coroutines.flow.Flow
 
 class LocalDeviceRepository(
@@ -12,6 +13,9 @@ class LocalDeviceRepository(
 ) : DeviceRepository {
 
     override fun getAllDevices(): Flow<List<DeviceEntity>> = deviceDao.getAll()
+
+    override fun getAllDevicesWithType(): Flow<List<DeviceWithType>> =
+        deviceDao.getAllWithType()
 
     override fun getDevicesByTypeId(typeId: Long): Flow<List<DeviceEntity>> =
         deviceDao.getByTypeId(typeId)

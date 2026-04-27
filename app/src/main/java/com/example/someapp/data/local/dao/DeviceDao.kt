@@ -5,14 +5,20 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.someapp.data.local.entity.DeviceEntity
+import com.example.someapp.data.local.entity.DeviceWithType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DeviceDao {
     @Query("SELECT * FROM device")
     fun getAll(): Flow<List<DeviceEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM device")
+    fun getAllWithType(): Flow<List<DeviceWithType>>
 
     @Query("SELECT * FROM device WHERE id = :id")
     suspend fun getById(id: Long): DeviceEntity?

@@ -2,10 +2,12 @@ package com.example.someapp.data.repository
 
 import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceTypeEntity
+import com.example.someapp.data.local.entity.DeviceWithType
 import kotlinx.coroutines.flow.Flow
 
 interface DeviceRepository {
     fun getAllDevices(): Flow<List<DeviceEntity>>
+    fun getAllDevicesWithType(): Flow<List<DeviceWithType>>
     fun getDevicesByTypeId(typeId: Long): Flow<List<DeviceEntity>>
     fun getDevicesByServingStatus(isServing: Boolean): Flow<List<DeviceEntity>>
     suspend fun getDeviceById(id: Long): DeviceEntity?
