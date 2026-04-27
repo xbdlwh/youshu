@@ -6,13 +6,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.runtime.NavKey
 import com.example.someapp.MyViewModelProvider
 import com.example.someapp.ui.main.components.DeviceListScreen
 
 @Composable
 fun MainScreen(
-  onItemClick: (NavKey) -> Unit,
+  onNavigateToAdd: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: MainScreenViewModel = viewModel(factory = MyViewModelProvider.FACTORY),
 ) {
@@ -22,8 +21,12 @@ fun MainScreen(
       Text("Loading...")
     }
     is MainScreenUiState.Success -> {
+      val successState = state as MainScreenUiState.Success
       DeviceListScreen(
-        devices = (state as MainScreenUiState.Success).devices,
+        devices = successState.devices,
+        deviceTypes = successState.deviceTypes,
+        onDeviceAdded = { input -> viewModel.addDevice(input) },
+        onNavigateToAdd = onNavigateToAdd,
         modifier = modifier
       )
     }

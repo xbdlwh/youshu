@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.someapp.ui.addDevice.AddDeviceViewModel
 import com.example.someapp.ui.main.MainScreenViewModel
 
 class MyViewModelProvider {
@@ -11,6 +12,9 @@ class MyViewModelProvider {
         val FACTORY = viewModelFactory {
             initializer {
                 MainScreenViewModel(container().deviceRepository)
+            }
+            initializer {
+                AddDeviceViewModel(container().deviceRepository)
             }
         }
     }

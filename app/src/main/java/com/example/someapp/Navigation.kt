@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.someapp.ui.main.MainScreen
+import com.example.someapp.ui.addDevice.AddDeviceScreen
 
 @Composable
 fun MainNavigation() {
@@ -20,7 +21,15 @@ fun MainNavigation() {
     entryProvider =
       entryProvider {
         entry<Main> {
-          MainScreen(onItemClick = { navKey -> backStack.add(navKey) }, modifier = Modifier.safeDrawingPadding().padding(16.dp))
+          MainScreen(
+            onNavigateToAdd = { backStack.add(AddDevice) },
+            modifier = Modifier.safeDrawingPadding().padding(16.dp)
+          )
+        }
+        entry<AddDevice> {
+          AddDeviceScreen(
+            onNavigateBack = { backStack.removeLastOrNull() }
+          )
         }
       },
   )
