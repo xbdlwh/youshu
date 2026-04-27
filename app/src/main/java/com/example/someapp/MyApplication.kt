@@ -4,6 +4,8 @@ import android.app.Application
 import com.example.someapp.data.DataRepository
 import com.example.someapp.data.DefaultDataRepository
 import com.example.someapp.data.local.AppDatabase
+import com.example.someapp.data.repository.DeviceRepository
+import com.example.someapp.data.repository.LocalDeviceRepository
 
 class MyApplication : Application() {
 
@@ -24,4 +26,8 @@ class AppContainer(application: Application) {
     val deviceTypeDao by lazy { database.deviceTypeDao() }
 
     val dataRepository: DataRepository by lazy { DefaultDataRepository() }
+
+    val deviceRepository: DeviceRepository by lazy {
+        LocalDeviceRepository(deviceDao, deviceTypeDao)
+    }
 }
