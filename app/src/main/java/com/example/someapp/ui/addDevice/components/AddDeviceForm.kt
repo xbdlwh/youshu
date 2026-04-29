@@ -14,6 +14,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
@@ -22,6 +24,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -49,18 +52,25 @@ import java.util.Locale
 @Composable
 fun AddDeviceForm(
   deviceTypes: List<DeviceTypeEntity>,
+  typeIdsInUse: Set<Long>,
   formState: AddDeviceFormState,
   onFormStateChange: (AddDeviceFormState) -> Unit,
   onTypeSelected: (Long) -> Unit,
-  onAddDeviceType: () -> Boolean,
-  onDismissAddTypeDialog: () -> Unit,
+  onAddDeviceType: (String, String) -> Boolean,
+  onUpdateDeviceType: (DeviceTypeEntity, String, String) -> Boolean,
+  onDeleteDeviceType: (DeviceTypeEntity) -> Boolean,
   onSubmit: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val selectedTypeName = deviceTypes.find { it.id == formState.typeId }?.name.orEmpty()
   var isTypeSheetVisible by rememberSaveable { mutableStateOf(false) }
-  var isAddTypeDialogVisible by rememberSaveable { mutableStateOf(false) }
+  var isManagingTypes by rememberSaveable { mutableStateOf(false) }
+  var isTypeDialogVisible by rememberSaveable { mutableStateOf(false) }
+  var editingTypeId by rememberSaveable { mutableStateOf<Long?>(null) }
+  var typeDialogName by rememberSaveable { mutableStateOf("") }
+  var typeDialogIcon by rememberSaveable { mutableStateOf("") }
   var isPurchaseDatePickerVisible by rememberSaveable { mutableStateOf(false) }
+  val editingType = deviceTypes.firstOrNull { it.id == editingTypeId }
 
   Column(
     modifier = modifier.fillMaxWidth(),
@@ -135,38 +145,68 @@ fun AddDeviceForm(
   if (isTypeSheetVisible) {
     DeviceTypeBottomSheet(
       deviceTypes = deviceTypes,
+      typeIdsInUse = typeIdsInUse,
       selectedTypeId = formState.typeId,
-      onDismiss = { isTypeSheetVisible = false },
+      isManaging = isManagingTypes,
+      onManagingChange = { isManagingTypes = it },
+      onDismiss = {
+        isTypeSheetVisible = false
+        isManagingTypes = false
+      },
       onTypeSelected = { typeId ->
         onTypeSelected(typeId)
         isTypeSheetVisible = false
+        isManagingTypes = false
       },
       onAddTypeClick = {
-        isAddTypeDialogVisible = true
+        editingTypeId = null
+        typeDialogName = ""
+        typeDialogIcon = ""
+        isTypeDialogVisible = true
+      },
+      onEditTypeClick = { type ->
+        editingTypeId = type.id
+        typeDialogName = type.name
+        typeDialogIcon = type.icon
+        isTypeDialogVisible = true
+      },
+      onDeleteTypeClick = { type ->
+        onDeleteDeviceType(type)
       }
     )
   }
 
-  if (isAddTypeDialogVisible) {
-    AddDeviceTypeDialog(
-      name = formState.newTypeName,
-      icon = formState.newTypeIcon,
+  if (isTypeDialogVisible) {
+    DeviceTypeEditorDialog(
+      title = if (editingType == null) "Add Type" else "Edit Type",
+      name = typeDialogName,
+      icon = typeDialogIcon,
       isDuplicate = deviceTypes.any {
-        it.name.equals(formState.newTypeName.trim(), ignoreCase = true)
+        it.id != editingTypeId && it.name.equals(typeDialogName.trim(), ignoreCase = true)
       },
-      onNameChange = { onFormStateChange(formState.copy(newTypeName = it)) },
-      onIconChange = { onFormStateChange(formState.copy(newTypeIcon = it)) },
+      onNameChange = { typeDialogName = it },
+      onIconChange = { typeDialogIcon = it },
       onDismiss = {
-        onDismissAddTypeDialog()
-        isAddTypeDialogVisible = false
+        isTypeDialogVisible = false
+        editingTypeId = null
+        typeDialogName = ""
+        typeDialogIcon = ""
       },
       onConfirm = {
-        val added = onAddDeviceType()
-        if (added) {
-          isAddTypeDialogVisible = false
-          isTypeSheetVisible = false
+        val saved = if (editingType == null) {
+          onAddDeviceType(typeDialogName, typeDialogIcon)
+        } else {
+          onUpdateDeviceType(editingType, typeDialogName, typeDialogIcon)
         }
-        added
+        if (saved) {
+          isTypeDialogVisible = false
+          isTypeSheetVisible = false
+          isManagingTypes = false
+          editingTypeId = null
+          typeDialogName = ""
+          typeDialogIcon = ""
+        }
+        saved
       }
     )
   }
@@ -285,10 +325,15 @@ private fun PurchaseDatePickerDialog(
 @Composable
 fun DeviceTypeBottomSheet(
   deviceTypes: List<DeviceTypeEntity>,
+  typeIdsInUse: Set<Long>,
   selectedTypeId: Long,
+  isManaging: Boolean,
+  onManagingChange: (Boolean) -> Unit,
   onDismiss: () -> Unit,
   onTypeSelected: (Long) -> Unit,
   onAddTypeClick: () -> Unit,
+  onEditTypeClick: (DeviceTypeEntity) -> Unit,
+  onDeleteTypeClick: (DeviceTypeEntity) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   ModalBottomSheet(
@@ -305,26 +350,55 @@ fun DeviceTypeBottomSheet(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
       ) {
-        Text("Device Type", style = MaterialTheme.typography.titleLarge)
-        TextButton(onClick = onAddTypeClick) {
-          Icon(Icons.Default.Add, contentDescription = null)
-          Text("Add Type")
+        Text(
+          text = if (isManaging) "Manage Types" else "Device Type",
+          style = MaterialTheme.typography.titleLarge
+        )
+        TextButton(onClick = { onManagingChange(!isManaging) }) {
+          Text(if (isManaging) "Done" else "Manage")
         }
       }
 
       LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(deviceTypes, key = { it.id }) { type ->
+          val isInUse = type.id in typeIdsInUse
           ListItem(
             headlineContent = { Text(type.name) },
-            supportingContent = { Text(type.icon) },
+            supportingContent = {
+              Text(if (isManaging && isInUse) "${type.icon} · In use" else type.icon)
+            },
             trailingContent = {
-              if (type.id == selectedTypeId) {
+              if (isManaging) {
+                Row {
+                  IconButton(onClick = { onEditTypeClick(type) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit Type")
+                  }
+                  IconButton(
+                    onClick = { onDeleteTypeClick(type) },
+                    enabled = !isInUse
+                  ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete Type")
+                  }
+                }
+              } else if (type.id == selectedTypeId) {
                 Icon(Icons.Default.Check, contentDescription = "Selected")
               }
             },
-            modifier = Modifier.clickable { onTypeSelected(type.id) }
+            modifier = if (isManaging) {
+              Modifier
+            } else {
+              Modifier.clickable { onTypeSelected(type.id) }
+            }
           )
         }
+      }
+
+      TextButton(
+        onClick = onAddTypeClick,
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Icon(Icons.Default.Add, contentDescription = null)
+        Text("Add Type")
       }
 
       Spacer(modifier = Modifier.height(24.dp))
@@ -333,7 +407,8 @@ fun DeviceTypeBottomSheet(
 }
 
 @Composable
-fun AddDeviceTypeDialog(
+fun DeviceTypeEditorDialog(
+  title: String,
   name: String,
   icon: String,
   isDuplicate: Boolean,
@@ -348,7 +423,7 @@ fun AddDeviceTypeDialog(
 
   AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Add Type") },
+    title = { Text(title) },
     text = {
       Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedTextField(

@@ -26,11 +26,13 @@ import com.example.someapp.ui.addDevice.AddDeviceFormState
 fun AddDeviceScaffold(
   onNavigateBack: () -> Unit,
   deviceTypes: List<DeviceTypeEntity>,
+  typeIdsInUse: Set<Long>,
   formState: AddDeviceFormState,
   onFormStateChange: (AddDeviceFormState) -> Unit,
   onTypeSelected: (Long) -> Unit,
-  onAddDeviceType: () -> Boolean,
-  onDismissAddTypeDialog: () -> Unit,
+  onAddDeviceType: (String, String) -> Boolean,
+  onUpdateDeviceType: (DeviceTypeEntity, String, String) -> Boolean,
+  onDeleteDeviceType: (DeviceTypeEntity) -> Boolean,
   onSubmit: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -58,11 +60,13 @@ fun AddDeviceScaffold(
 
       AddDeviceForm(
         deviceTypes = deviceTypes,
+        typeIdsInUse = typeIdsInUse,
         formState = formState,
         onFormStateChange = onFormStateChange,
         onTypeSelected = onTypeSelected,
         onAddDeviceType = onAddDeviceType,
-        onDismissAddTypeDialog = onDismissAddTypeDialog,
+        onUpdateDeviceType = onUpdateDeviceType,
+        onDeleteDeviceType = onDeleteDeviceType,
         onSubmit = onSubmit
       )
     }

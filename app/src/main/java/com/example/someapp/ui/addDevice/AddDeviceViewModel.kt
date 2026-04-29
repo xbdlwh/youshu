@@ -21,9 +21,7 @@ data class AddDeviceFormState(
     val typeId: Long = 0L,
     val price: String = "",
     val isServing: Boolean = true,
-    val purchaseDate: Long = System.currentTimeMillis(),
-    val newTypeName: String = "",
-    val newTypeIcon: String = ""
+    val purchaseDate: Long = System.currentTimeMillis()
 ) {
     val isValid: Boolean
         get() = name.isNotBlank() && typeId > 0 && price.toDoubleOrNull() != null
@@ -56,6 +54,13 @@ class AddDeviceViewModel(
       initialValue = emptyList()
     )
 
+  val devices: StateFlow<List<DeviceEntity>> = deviceRepository.getAllDevices()
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.Companion.WhileSubscribed(5000),
+      initialValue = emptyList()
+    )
+
   init {
     seedDefaultDeviceTypes()
   }
@@ -68,17 +73,9 @@ class AddDeviceViewModel(
     _formState.value = _formState.value.copy(typeId = typeId)
   }
 
-  fun dismissAddTypeDialog() {
-    _formState.value = _formState.value.copy(
-      newTypeName = "",
-      newTypeIcon = ""
-    )
-  }
-
-  fun addDeviceType(): Boolean {
-    val state = _formState.value
-    val name = state.newTypeName.trim()
-    val icon = state.newTypeIcon.trim()
+  fun addDeviceType(name: String, icon: String): Boolean {
+    val name = name.trim()
+    val icon = icon.trim()
     if (name.isEmpty() || icon.isEmpty()) return false
     if (deviceTypes.value.any { it.name.equals(name, ignoreCase = true) }) return false
 
@@ -90,10 +87,41 @@ class AddDeviceViewModel(
         )
       )
       _formState.value = _formState.value.copy(
-        typeId = id,
-        newTypeName = "",
-        newTypeIcon = ""
+        typeId = id
       )
+    }
+    return true
+  }
+
+  fun updateDeviceType(
+    type: DeviceTypeEntity,
+    name: String,
+    icon: String
+  ): Boolean {
+    val name = name.trim()
+    val icon = icon.trim()
+    if (name.isEmpty() || icon.isEmpty()) return false
+    if (deviceTypes.value.any { it.id != type.id && it.name.equals(name, ignoreCase = true) }) return false
+
+    viewModelScope.launch {
+      deviceRepository.updateDeviceType(
+        type.copy(
+          name = name,
+          icon = icon
+        )
+      )
+    }
+    return true
+  }
+
+  fun deleteDeviceType(type: DeviceTypeEntity): Boolean {
+    if (devices.value.any { it.typeId == type.id }) return false
+
+    viewModelScope.launch {
+      deviceRepository.deleteDeviceType(type)
+      if (_formState.value.typeId == type.id) {
+        _formState.value = _formState.value.copy(typeId = 0L)
+      }
     }
     return true
   }
