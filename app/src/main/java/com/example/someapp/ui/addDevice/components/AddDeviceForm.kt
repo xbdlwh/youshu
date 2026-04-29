@@ -14,9 +14,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -38,6 +41,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.ui.addDevice.AddDeviceFormState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +60,7 @@ fun AddDeviceForm(
   val selectedTypeName = deviceTypes.find { it.id == formState.typeId }?.name.orEmpty()
   var isTypeSheetVisible by rememberSaveable { mutableStateOf(false) }
   var isAddTypeDialogVisible by rememberSaveable { mutableStateOf(false) }
+  var isPurchaseDatePickerVisible by rememberSaveable { mutableStateOf(false) }
 
   Column(
     modifier = modifier.fillMaxWidth(),
@@ -94,6 +101,12 @@ fun AddDeviceForm(
       singleLine = true,
       prefix = { Text("$") },
       keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+    )
+
+    PurchaseDateSelector(
+      purchaseDate = formState.purchaseDate,
+      onClick = { isPurchaseDatePickerVisible = true },
+      modifier = Modifier.fillMaxWidth()
     )
 
     Row(
@@ -157,6 +170,17 @@ fun AddDeviceForm(
       }
     )
   }
+
+  if (isPurchaseDatePickerVisible) {
+    PurchaseDatePickerDialog(
+      selectedDateMillis = formState.purchaseDate,
+      onDateSelected = { selectedDate ->
+        onFormStateChange(formState.copy(purchaseDate = selectedDate))
+        isPurchaseDatePickerVisible = false
+      },
+      onDismiss = { isPurchaseDatePickerVisible = false }
+    )
+  }
 }
 
 @Composable
@@ -189,6 +213,71 @@ private fun DeviceTypeSelector(
       }
       Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Select Device Type")
     }
+  }
+}
+
+@Composable
+private fun PurchaseDateSelector(
+  purchaseDate: Long,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  OutlinedButton(
+    onClick = onClick,
+    modifier = modifier
+  ) {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Column {
+        Text(
+          text = "Purchase Date",
+          style = MaterialTheme.typography.labelMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+          text = formatPurchaseDate(purchaseDate),
+          style = MaterialTheme.typography.bodyLarge
+        )
+      }
+      Icon(Icons.Default.Event, contentDescription = "Select Purchase Date")
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PurchaseDatePickerDialog(
+  selectedDateMillis: Long,
+  onDateSelected: (Long) -> Unit,
+  onDismiss: () -> Unit,
+) {
+  val datePickerState = androidx.compose.material3.rememberDatePickerState(
+    initialSelectedDateMillis = selectedDateMillis
+  )
+
+  DatePickerDialog(
+    onDismissRequest = onDismiss,
+    confirmButton = {
+      Button(
+        onClick = {
+          onDateSelected(datePickerState.selectedDateMillis ?: selectedDateMillis)
+        }
+      ) {
+        Text("OK")
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onDismiss) {
+        Text("Cancel")
+      }
+    }
+  ) {
+    DatePicker(state = datePickerState)
   }
 }
 
@@ -301,3 +390,6 @@ fun AddDeviceTypeDialog(
 }
 
 private val PRICE_INPUT_REGEX = Regex("""\d*\.?\d{0,2}""")
+
+private fun formatPurchaseDate(timestamp: Long): String =
+  SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(timestamp))

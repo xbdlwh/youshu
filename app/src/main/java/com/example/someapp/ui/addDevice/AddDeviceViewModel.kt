@@ -21,6 +21,7 @@ data class AddDeviceFormState(
     val typeId: Long = 0L,
     val price: String = "",
     val isServing: Boolean = true,
+    val purchaseDate: Long = System.currentTimeMillis(),
     val newTypeName: String = "",
     val newTypeIcon: String = ""
 ) {
@@ -35,7 +36,7 @@ data class AddDeviceFormState(
             typeId = typeId,
             price = priceValue,
             isServing = isServing,
-            purchaseDate = System.currentTimeMillis()
+            purchaseDate = purchaseDate
         )
     }
 }
