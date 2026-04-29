@@ -21,7 +21,8 @@ data class AddDeviceFormState(
     val typeId: Long = 0L,
     val price: String = "",
     val isServing: Boolean = true,
-    val isDropdownExpanded: Boolean = false
+    val newTypeName: String = "",
+    val newTypeIcon: String = ""
 ) {
     val isValid: Boolean
         get() = name.isNotBlank() && typeId > 0 && price.toDoubleOrNull() != null
@@ -60,6 +61,40 @@ class AddDeviceViewModel(
 
   fun updateFormState(state: AddDeviceFormState) {
     _formState.value = state
+  }
+
+  fun selectDeviceType(typeId: Long) {
+    _formState.value = _formState.value.copy(typeId = typeId)
+  }
+
+  fun dismissAddTypeDialog() {
+    _formState.value = _formState.value.copy(
+      newTypeName = "",
+      newTypeIcon = ""
+    )
+  }
+
+  fun addDeviceType(): Boolean {
+    val state = _formState.value
+    val name = state.newTypeName.trim()
+    val icon = state.newTypeIcon.trim()
+    if (name.isEmpty() || icon.isEmpty()) return false
+    if (deviceTypes.value.any { it.name.equals(name, ignoreCase = true) }) return false
+
+    viewModelScope.launch {
+      val id = deviceRepository.insertDeviceType(
+        DeviceTypeEntity(
+          name = name,
+          icon = icon
+        )
+      )
+      _formState.value = _formState.value.copy(
+        typeId = id,
+        newTypeName = "",
+        newTypeIcon = ""
+      )
+    }
+    return true
   }
 
   fun addDevice(): Boolean {

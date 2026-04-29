@@ -28,6 +28,9 @@ fun AddDeviceScaffold(
   deviceTypes: List<DeviceTypeEntity>,
   formState: AddDeviceFormState,
   onFormStateChange: (AddDeviceFormState) -> Unit,
+  onTypeSelected: (Long) -> Unit,
+  onAddDeviceType: () -> Boolean,
+  onDismissAddTypeDialog: () -> Unit,
   onSubmit: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -57,6 +60,9 @@ fun AddDeviceScaffold(
         deviceTypes = deviceTypes,
         formState = formState,
         onFormStateChange = onFormStateChange,
+        onTypeSelected = onTypeSelected,
+        onAddDeviceType = onAddDeviceType,
+        onDismissAddTypeDialog = onDismissAddTypeDialog,
         onSubmit = onSubmit
       )
     }
