@@ -20,6 +20,10 @@ fun AddDeviceScreen(
     deviceTypes = deviceTypes,
     formState = formState,
     onFormStateChange = viewModel::updateFormState,
-    onSubmit = viewModel::addDevice
+    onSubmit = {
+      if (viewModel.addDevice()) {
+        onNavigateBack()
+      }
+    }
   )
 }

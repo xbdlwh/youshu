@@ -14,11 +14,9 @@ import kotlinx.coroutines.launch
 
 class MainScreenViewModel(private val deviceRepository: DeviceRepository) : ViewModel() {
 
-  private val _deviceTypes = deviceRepository.getAllDeviceTypes()
-
   val uiState: StateFlow<MainScreenUiState> = combine(
     deviceRepository.getAllDevicesWithType(),
-    _deviceTypes
+    deviceRepository.getAllDeviceTypes()
   ) { devices, deviceTypes ->
     MainScreenUiState.Success(
       devices = devices,

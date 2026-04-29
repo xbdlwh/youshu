@@ -10,8 +10,35 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+
+data class AddDeviceFormState(
+    val name: String = "",
+    val icon: String = "",
+    val typeId: Long = 0L,
+    val price: String = "",
+    val isServing: Boolean = true,
+    val isDropdownExpanded: Boolean = false
+) {
+    val isValid: Boolean
+        get() = name.isNotBlank() && typeId > 0 && price.toDoubleOrNull() != null
+
+    fun toDeviceInput(): DeviceInput? {
+        val priceValue = price.toDoubleOrNull() ?: return null
+        return DeviceInput(
+            name = name,
+            icon = icon,
+            typeId = typeId,
+            price = priceValue,
+            isServing = isServing,
+            purchaseDate = System.currentTimeMillis()
+        )
+    }
+}
+
 
 class AddDeviceViewModel(
     private val deviceRepository: DeviceRepository,
@@ -27,24 +54,47 @@ class AddDeviceViewModel(
       initialValue = emptyList()
     )
 
+  init {
+    seedDefaultDeviceTypes()
+  }
+
   fun updateFormState(state: AddDeviceFormState) {
     _formState.value = state
   }
 
-  fun addDevice() {
-    val input = _formState.value.toDeviceInput() ?: return
+  fun addDevice(): Boolean {
+    val input = _formState.value.toDeviceInput() ?: return false
     viewModelScope.launch {
       deviceRepository.insertDevice(
-          DeviceEntity(
-              name = input.name,
-              icon = input.icon,
-              typeId = input.typeId,
-              price = input.price,
-              isServing = input.isServing,
-              purchaseDate = input.purchaseDate ?: System.currentTimeMillis()
-          )
+        DeviceEntity(
+          name = input.name,
+          icon = input.icon.ifBlank { "devices" },
+          typeId = input.typeId,
+          price = input.price,
+          isServing = input.isServing,
+          purchaseDate = input.purchaseDate ?: System.currentTimeMillis()
+        )
       )
     }
     _formState.value = AddDeviceFormState()
+    return true
+  }
+
+  private fun seedDefaultDeviceTypes() {
+    viewModelScope.launch {
+      if (deviceRepository.getAllDeviceTypes().first().isEmpty()) {
+        deviceRepository.insertDeviceTypes(defaultDeviceTypes)
+      }
+    }
+  }
+
+  private companion object {
+    val defaultDeviceTypes = listOf(
+      DeviceTypeEntity(name = "Phone", icon = "phone"),
+      DeviceTypeEntity(name = "Tablet", icon = "tablet"),
+      DeviceTypeEntity(name = "Laptop", icon = "laptop"),
+      DeviceTypeEntity(name = "Wearable", icon = "watch"),
+      DeviceTypeEntity(name = "Other", icon = "devices")
+    )
   }
 }

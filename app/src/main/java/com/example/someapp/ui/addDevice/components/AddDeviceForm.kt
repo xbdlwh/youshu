@@ -1,13 +1,17 @@
 package com.example.someapp.ui.addDevice.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -16,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.ui.addDevice.AddDeviceFormState
@@ -31,6 +36,7 @@ fun AddDeviceForm(
 ) {
   Column(
     modifier = modifier.fillMaxWidth(),
+    verticalArrangement = Arrangement.spacedBy(12.dp),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     OutlinedTextField(
@@ -41,8 +47,6 @@ fun AddDeviceForm(
       singleLine = true
     )
 
-    Spacer(modifier = Modifier.height(12.dp))
-
     OutlinedTextField(
       value = formState.icon,
       onValueChange = { onFormStateChange(formState.copy(icon = it)) },
@@ -50,8 +54,6 @@ fun AddDeviceForm(
       modifier = Modifier.fillMaxWidth(),
       singleLine = true
     )
-
-    Spacer(modifier = Modifier.height(12.dp))
 
     DeviceTypeDropdown(
       deviceTypes = deviceTypes,
@@ -64,20 +66,25 @@ fun AddDeviceForm(
       modifier = Modifier.fillMaxWidth()
     )
 
-    Spacer(modifier = Modifier.height(12.dp))
-
     OutlinedTextField(
       value = formState.price,
-      onValueChange = { onFormStateChange(formState.copy(price = it)) },
+      onValueChange = { value ->
+        if (value.isEmpty() || value.matches(PRICE_INPUT_REGEX)) {
+          onFormStateChange(formState.copy(price = value))
+        }
+      },
       label = { Text("Price") },
       modifier = Modifier.fillMaxWidth(),
       singleLine = true,
-      prefix = { Text("$") }
+      prefix = { Text("$") },
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
     )
 
-    Spacer(modifier = Modifier.height(12.dp))
-
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
       Text("Serving", style = MaterialTheme.typography.bodyLarge)
       Switch(
         checked = formState.isServing,
@@ -85,7 +92,7 @@ fun AddDeviceForm(
       )
     }
 
-    Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(12.dp))
 
     Button(
       onClick = onSubmit,
@@ -120,7 +127,7 @@ fun DeviceTypeDropdown(
       trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
       modifier = Modifier
         .fillMaxWidth()
-        .menuAnchor()
+        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
     )
     ExposedDropdownMenu(
       expanded = expanded,
@@ -135,3 +142,5 @@ fun DeviceTypeDropdown(
     }
   }
 }
+
+private val PRICE_INPUT_REGEX = Regex("""\d*\.?\d{0,2}""")
