@@ -30,7 +30,12 @@ import com.example.someapp.theme.MyApplicationTheme
 fun DeviceItem(
   deviceWithType: DeviceWithType,
   modifier: Modifier = Modifier,
+  currentTimeMillis: Long = System.currentTimeMillis(),
 ) {
+  val device = deviceWithType.device
+  val dailyCost = device.dailyCost(currentTimeMillis)
+  val ownedDays = device.ownedDays(currentTimeMillis)
+
   Card(
     modifier = modifier.fillMaxWidth(),
     colors = CardDefaults.cardColors(
@@ -64,7 +69,7 @@ fun DeviceItem(
         verticalArrangement = Arrangement.spacedBy(4.dp)
       ) {
         Text(
-          text = deviceWithType.device.name,
+          text = device.name,
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.SemiBold,
           maxLines = 1,
@@ -82,10 +87,20 @@ fun DeviceItem(
         verticalArrangement = Arrangement.spacedBy(4.dp)
       ) {
         Text(
-          text = "$${String.format("%.2f", deviceWithType.device.price)}",
+          text = "${dailyCost.currencyText()}/day",
           style = MaterialTheme.typography.titleSmall,
           fontWeight = FontWeight.Bold,
           color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+          text = device.price.currencyText(),
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+          text = "$ownedDays days",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         StatusBadge(isServing = deviceWithType.device.isServing)
       }

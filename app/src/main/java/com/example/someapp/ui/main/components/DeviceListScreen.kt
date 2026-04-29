@@ -40,6 +40,8 @@ internal fun DeviceListScreen(
     Column(modifier = Modifier
       .padding(paddingValues)
       .padding(horizontal = 8.dp),) {
+      AssetSummaryCard(devices = devices)
+      Spacer(Modifier.height(12.dp))
       devices.forEach { deviceWithType ->
         DeviceItem(deviceWithType = deviceWithType)
         Spacer(Modifier.height(9.dp))
