@@ -10,16 +10,20 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.someapp.ui.main.MainScreen
 import com.example.someapp.ui.addDevice.AddDeviceScreen
+import com.example.someapp.ui.test.TestScreen
 
 @Composable
 fun MainNavigation() {
-  val backStack = rememberNavBackStack(Main)
+  val backStack = rememberNavBackStack(FileTest)
 
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },
     entryProvider =
       entryProvider {
+        entry <FileTest>{
+          TestScreen()
+        }
         entry<Main> {
           MainScreen(
             onNavigateToAdd = { backStack.add(AddDevice) },

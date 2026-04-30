@@ -6,3 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object Main : NavKey
 
 @Serializable data object AddDevice : NavKey
+
+@Serializable data object FileTest: NavKey
