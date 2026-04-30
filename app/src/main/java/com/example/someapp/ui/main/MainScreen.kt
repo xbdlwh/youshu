@@ -12,6 +12,7 @@ import com.example.someapp.ui.main.components.DeviceListScreen
 @Composable
 fun MainScreen(
   onNavigateToAdd: () -> Unit,
+  onNavigateToDetail: (Long) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: MainScreenViewModel = viewModel(factory = MyViewModelProvider.FACTORY),
 ) {
@@ -27,6 +28,7 @@ fun MainScreen(
         deviceTypes = successState.deviceTypes,
         onDeviceAdded = { input -> viewModel.addDevice(input) },
         onNavigateToAdd = onNavigateToAdd,
+        onDeviceClick = onNavigateToDetail,
         modifier = modifier
       )
     }

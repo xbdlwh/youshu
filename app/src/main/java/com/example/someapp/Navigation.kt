@@ -8,12 +8,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.someapp.data.repository.DeviceRepository
 import com.example.someapp.ui.main.MainScreen
 import com.example.someapp.ui.addDevice.AddDeviceScreen
 import com.example.someapp.ui.test.TestScreen
+import com.example.someapp.ui.deviceDetail.DeviceDetailScreen
 
 @Composable
-fun MainNavigation() {
+fun MainNavigation(
+  deviceRepository: DeviceRepository,
+) {
   val backStack = rememberNavBackStack(Main)
 
   NavDisplay(
@@ -27,12 +31,19 @@ fun MainNavigation() {
         entry<Main> {
           MainScreen(
             onNavigateToAdd = { backStack.add(AddDevice) },
+            onNavigateToDetail = { deviceId -> backStack.add(DeviceDetail(deviceId)) },
             modifier = Modifier.safeDrawingPadding().padding(16.dp)
           )
         }
         entry<AddDevice> {
           AddDeviceScreen(
             onNavigateBack = { backStack.removeLastOrNull() }
+          )
+        }
+        entry<DeviceDetail> { key ->
+          DeviceDetailScreen(
+            deviceId = key.deviceId,
+            onNavigateBack = { backStack.removeLastOrNull() },
           )
         }
       },

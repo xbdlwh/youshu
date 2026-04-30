@@ -1,5 +1,6 @@
 package com.example.someapp.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -52,7 +53,11 @@ fun DeviceCategoryList(
 
     LazyColumn {
       items(filteredDevices, key = { it.device.id }) { deviceWithType ->
-        deviceItemContent(deviceWithType)
+        Column(
+          modifier = Modifier.clickable { onDeviceClick(deviceWithType) }
+        ) {
+          deviceItemContent(deviceWithType)
+        }
         Spacer(Modifier.height(9.dp))
       }
     }

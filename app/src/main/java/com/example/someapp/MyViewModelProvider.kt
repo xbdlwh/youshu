@@ -1,10 +1,14 @@
 package com.example.someapp
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.someapp.data.repository.DeviceRepository
 import com.example.someapp.ui.addDevice.AddDeviceViewModel
+import com.example.someapp.ui.deviceDetail.DeviceDetailViewModel
 import com.example.someapp.ui.main.MainScreenViewModel
 
 class MyViewModelProvider {
@@ -15,6 +19,9 @@ class MyViewModelProvider {
             }
             initializer {
                 AddDeviceViewModel(container().deviceRepository)
+            }
+            initializer {
+                DeviceDetailViewModel(container().deviceRepository)
             }
         }
     }

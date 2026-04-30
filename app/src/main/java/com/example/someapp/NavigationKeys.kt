@@ -8,3 +8,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object AddDevice : NavKey
 
 @Serializable data object FileTest: NavKey
+
+@Serializable data class DeviceDetail(public val deviceId: Long) : NavKey

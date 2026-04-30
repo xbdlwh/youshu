@@ -28,6 +28,7 @@ internal fun DeviceListScreen(
   deviceTypes: List<DeviceTypeEntity> = emptyList(),
   onDeviceAdded: (DeviceInput) -> Unit = {},
   onNavigateToAdd: () -> Unit = {},
+  onDeviceClick: (Long) -> Unit = {},
 ) {
   Scaffold(modifier,
     floatingActionButton = {
@@ -46,7 +47,7 @@ internal fun DeviceListScreen(
       DeviceCategoryList(
         devices = devices,
         deviceTypes = deviceTypes,
-        onDeviceClick = {},
+        onDeviceClick = { deviceWithType -> onDeviceClick(deviceWithType.device.id) },
         deviceItemContent = { deviceWithType ->
           DeviceItem(deviceWithType = deviceWithType)
         }
