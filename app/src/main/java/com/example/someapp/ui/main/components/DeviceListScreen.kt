@@ -19,6 +19,7 @@ import com.example.someapp.data.local.entity.DeviceInput
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.data.local.entity.DeviceWithType
 import com.example.someapp.theme.MyApplicationTheme
+import com.example.someapp.ui.components.DeviceCategoryList
 
 @Composable
 internal fun DeviceListScreen(
@@ -39,13 +40,17 @@ internal fun DeviceListScreen(
     }) { paddingValues ->
     Column(modifier = Modifier
       .padding(paddingValues)
-      .padding(horizontal = 8.dp),) {
+      .padding(horizontal = 8.dp)) {
       AssetSummaryCard(devices = devices)
       Spacer(Modifier.height(12.dp))
-      devices.forEach { deviceWithType ->
-        DeviceItem(deviceWithType = deviceWithType)
-        Spacer(Modifier.height(9.dp))
-      }
+      DeviceCategoryList(
+        devices = devices,
+        deviceTypes = deviceTypes,
+        onDeviceClick = {},
+        deviceItemContent = { deviceWithType ->
+          DeviceItem(deviceWithType = deviceWithType)
+        }
+      )
     }
   }
 }
