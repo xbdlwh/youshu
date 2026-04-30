@@ -14,7 +14,7 @@ import com.example.someapp.ui.test.TestScreen
 
 @Composable
 fun MainNavigation() {
-  val backStack = rememberNavBackStack(FileTest)
+  val backStack = rememberNavBackStack(Main)
 
   NavDisplay(
     backStack = backStack,

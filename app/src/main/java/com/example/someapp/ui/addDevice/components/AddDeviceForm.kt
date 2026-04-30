@@ -85,12 +85,12 @@ fun AddDeviceForm(
       singleLine = true
     )
 
-    OutlinedTextField(
-      value = formState.icon,
-      onValueChange = { onFormStateChange(formState.copy(icon = it)) },
-      label = { Text("Icon") },
-      modifier = Modifier.fillMaxWidth(),
-      singleLine = true
+    ImagePickerButton(
+      currentIconPath = formState.icon,
+      onImageSelected = { filePath ->
+          onFormStateChange(formState.copy(icon = filePath))
+      },
+      modifier = Modifier.fillMaxWidth()
     )
 
     DeviceTypeSelector(
