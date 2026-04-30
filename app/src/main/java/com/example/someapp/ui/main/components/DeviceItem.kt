@@ -17,14 +17,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import coil3.compose.AsyncImage
 import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.data.local.entity.DeviceWithType
 import com.example.someapp.theme.MyApplicationTheme
+import java.io.File
 
 @Composable
 fun DeviceItem(
@@ -57,11 +60,22 @@ fun DeviceItem(
           .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
       ) {
-        Text(
-          text = deviceWithType.device.name.first().toString(),
-          style = MaterialTheme.typography.titleMedium,
-          color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
+        if (device.icon.isNotBlank() && File(device.icon).exists()) {
+          AsyncImage(
+            model = File(device.icon),
+            contentDescription = device.name,
+            modifier = Modifier
+              .size(48.dp)
+              .clip(CircleShape),
+            contentScale = ContentScale.Crop
+          )
+        } else {
+          Text(
+            text = device.name.first().toString(),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+          )
+        }
       }
 
       Column(
