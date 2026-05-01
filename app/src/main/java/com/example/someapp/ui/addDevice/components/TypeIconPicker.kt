@@ -43,9 +43,9 @@ fun TypeIconPicker(
         if (uri != null) {
             selectedUri = uri
             val fileName = "type_icon_${System.currentTimeMillis()}"
-            val savedFile = copyUriToFile(context, uri, fileName)
-            if (savedFile != null) {
-                onIconSelected(savedFile.absolutePath)
+            val savedFileName = copyUriToFile(context, uri, fileName)
+            if (savedFileName != null) {
+                onIconSelected(savedFileName)
             }
         }
     }
@@ -65,9 +65,9 @@ fun TypeIconPicker(
             },
         contentAlignment = Alignment.Center
     ) {
-        if (currentIconPath.isNotBlank() && File(currentIconPath).exists()) {
+        if (currentIconPath.isNotBlank() && File(context.filesDir, currentIconPath).exists()) {
             AsyncImage(
-                model = File(currentIconPath),
+                model = File(context.filesDir, currentIconPath),
                 contentDescription = "Selected type icon",
                 modifier = Modifier
                     .size(80.dp)

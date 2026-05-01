@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,7 @@ fun DeviceItem(
   val device = deviceWithType.device
   val dailyCost = device.dailyCost(currentTimeMillis)
   val ownedDays = device.ownedDays(currentTimeMillis)
-
+  val context = LocalContext.current
   Card(
     modifier = modifier.fillMaxWidth(),
     colors = CardDefaults.cardColors(
@@ -61,9 +62,9 @@ fun DeviceItem(
           .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
       ) {
-        if (device.icon.isNotBlank() && File(device.icon).exists()) {
+        if (device.icon.isNotBlank() && File(context.filesDir,device.icon).exists()) {
           AsyncImage(
-            model = File(device.icon),
+            model = File(context.filesDir,device.icon),
             contentDescription = device.name,
             modifier = Modifier
               .size(64.dp)

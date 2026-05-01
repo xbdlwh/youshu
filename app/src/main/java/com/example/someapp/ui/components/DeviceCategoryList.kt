@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.someapp.data.local.entity.DeviceTypeEntity
@@ -61,9 +62,9 @@ fun DeviceCategoryList(
             modifier = Modifier.padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
           ) {
-            if (tab.deviceType != null && tab.deviceType.icon.isNotBlank() && File(tab.deviceType.icon).exists()) {
+            if (tab.deviceType != null && tab.deviceType.icon.isNotBlank() && File(LocalContext.current.filesDir,tab.deviceType.icon).exists()) {
               AsyncImage(
-                model = File(tab.deviceType.icon),
+                model = File(LocalContext.current.filesDir,tab.deviceType.icon),
                 contentDescription = null,
                 modifier = Modifier
                   .size(20.dp)

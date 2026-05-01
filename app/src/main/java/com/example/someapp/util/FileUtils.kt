@@ -8,7 +8,7 @@ fun copyUriToFile(
     context: Context,
     uri: Uri,
     fileName: String = "device_icon_${System.currentTimeMillis()}"
-): File? {
+): String? {
     val resolver = context.contentResolver
     val file = File(context.filesDir, fileName)
     return try {
@@ -17,7 +17,7 @@ fun copyUriToFile(
                 input.copyTo(output)
             }
         }
-        file
+        file.name
     } catch (e: Exception) {
         e.printStackTrace()
         null

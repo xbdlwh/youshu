@@ -51,7 +51,7 @@ fun EditDeviceScaffold(
         .fillMaxSize()
         .padding(paddingValues)
         .padding(horizontal = 16.dp)
-        .verticalScroll(rememberScrollState())
+//        .verticalScroll(rememberScrollState())
     ) {
       Spacer(modifier = Modifier.height(16.dp))
 

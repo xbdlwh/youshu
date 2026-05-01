@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -156,9 +157,9 @@ private fun DeviceDetailContent(
         .background(MaterialTheme.colorScheme.primaryContainer),
       contentAlignment = Alignment.Center
     ) {
-      if (device.icon.isNotBlank() && File(device.icon).exists()) {
+      if (device.icon.isNotBlank() && File(LocalContext.current.filesDir,device.icon).exists()) {
         AsyncImage(
-          model = File(device.icon),
+          model = File(LocalContext.current.filesDir,device.icon),
           contentDescription = device.name,
           modifier = Modifier
             .size(120.dp)

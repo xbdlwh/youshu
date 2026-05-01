@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.someapp.data.local.entity.DeviceTypeEntity
@@ -127,9 +128,9 @@ fun DeviceTypeSelector(
                             headlineContent = { Text(type.name) },
                             supportingContent = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    if (type.icon.isNotBlank() && File(type.icon).exists()) {
+                                    if (type.icon.isNotBlank() && File(LocalContext.current.filesDir,type.icon).exists()) {
                                         AsyncImage(
-                                            model = File(type.icon),
+                                            model = File(LocalContext.current.filesDir,type.icon),
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .size(24.dp)

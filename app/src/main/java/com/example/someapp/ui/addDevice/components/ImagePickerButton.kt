@@ -45,9 +45,9 @@ fun ImagePickerButton(
         if (uri != null) {
             selectedUri = uri
             val fileName = "device_icon_${System.currentTimeMillis()}"
-            val savedFile = copyUriToFile(context, uri, fileName)
-            if (savedFile != null) {
-                onImageSelected(savedFile.absolutePath)
+            val savedFileName = copyUriToFile(context, uri, fileName)
+            if (savedFileName != null) {
+                onImageSelected(savedFileName)
             }
         }
     }
@@ -69,7 +69,7 @@ fun ImagePickerButton(
     ) {
         if (currentIconPath.isNotBlank()) {
             AsyncImage(
-                model = File(currentIconPath),
+                model = File(context.filesDir, currentIconPath),
                 contentDescription = "Selected device icon",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
