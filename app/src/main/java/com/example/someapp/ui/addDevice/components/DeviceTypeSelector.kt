@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.util.zip.ZipOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +69,7 @@ fun DeviceTypeSelector(
     var typeDialogIcon by rememberSaveable { mutableStateOf("") }
     val editingType = deviceTypes.firstOrNull { it.id == editingTypeId }
     val sheetState = rememberModalBottomSheetState()
+
 
     OutlinedButton(
         onClick = { isTypeSheetVisible = true },
