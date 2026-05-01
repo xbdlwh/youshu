@@ -89,6 +89,9 @@ fun DeviceCategoryList(
         }
         Spacer(Modifier.height(9.dp))
       }
+      item {
+        Spacer(Modifier.height(80.dp))
+      }
     }
   }
 }
