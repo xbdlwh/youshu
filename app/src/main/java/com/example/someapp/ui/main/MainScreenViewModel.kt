@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.someapp.data.local.entity.DeviceInput
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.data.local.entity.DeviceWithType
+import com.example.someapp.data.repository.AllDevicesAndTypes
 import com.example.someapp.data.repository.DeviceRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class MainScreenViewModel(private val deviceRepository: DeviceRepository) : ViewModel() {
 
@@ -42,6 +45,11 @@ class MainScreenViewModel(private val deviceRepository: DeviceRepository) : View
         )
       )
     }
+  }
+
+  suspend fun exportDataAsJson(): String {
+    val allData = deviceRepository.getAllData()
+    return Json.encodeToString(allData)
   }
 }
 

@@ -10,10 +10,12 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.someapp.data.repository.DeviceRepository
 import com.example.someapp.ui.main.MainScreen
+import com.example.someapp.ui.main.MainScreenViewModel
 import com.example.someapp.ui.addDevice.AddDeviceScreen
 import com.example.someapp.ui.test.TestScreen
 import com.example.someapp.ui.deviceDetail.DeviceDetailScreen
 import com.example.someapp.ui.editDevice.EditDeviceScreen
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun MainNavigation(
@@ -30,10 +32,16 @@ fun MainNavigation(
           TestScreen()
         }
         entry<Main> {
+//          val mainScreenViewModel = MainScreenViewModel(deviceRepository)
           MainScreen(
             onNavigateToAdd = { backStack.add(AddDevice) },
             onNavigateToDetail = { deviceId -> backStack.add(DeviceDetail(deviceId)) },
-            modifier = Modifier.safeDrawingPadding().padding(16.dp)
+//            onExportJson = {
+//              runBlocking {
+//                mainScreenViewModel.exportDataAsJson()
+//              }
+//            },
+//            modifier = Modifier.safeDrawingPadding().padding(16.dp)
           )
         }
         entry<AddDevice> {

@@ -6,6 +6,7 @@ import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.data.local.entity.DeviceWithType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class LocalDeviceRepository(
     private val deviceDao: DeviceDao,
@@ -58,4 +59,11 @@ class LocalDeviceRepository(
 
     override suspend fun deleteDeviceType(deviceType: DeviceTypeEntity) =
         deviceTypeDao.delete(deviceType)
+
+    override suspend fun getAllData(): AllDevicesAndTypes {
+        return AllDevicesAndTypes(
+            devices = deviceDao.getAll().first(),
+            types = deviceTypeDao.getAll().first()
+        )
+    }
 }

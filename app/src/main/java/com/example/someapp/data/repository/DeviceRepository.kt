@@ -4,6 +4,7 @@ import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceTypeEntity
 import com.example.someapp.data.local.entity.DeviceWithType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 interface DeviceRepository {
     fun getAllDevices(): Flow<List<DeviceEntity>>
@@ -23,4 +24,12 @@ interface DeviceRepository {
     suspend fun insertDeviceTypes(deviceTypes: List<DeviceTypeEntity>)
     suspend fun updateDeviceType(deviceType: DeviceTypeEntity)
     suspend fun deleteDeviceType(deviceType: DeviceTypeEntity)
+
+    suspend fun getAllData(): AllDevicesAndTypes
 }
+
+@Serializable
+data class AllDevicesAndTypes(
+    val devices: List<DeviceEntity>,
+    val types: List<DeviceTypeEntity>
+)

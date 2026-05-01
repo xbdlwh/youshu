@@ -8,11 +8,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.someapp.MyViewModelProvider
 import com.example.someapp.ui.main.components.DeviceListScreen
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun MainScreen(
   onNavigateToAdd: () -> Unit,
   onNavigateToDetail: (Long) -> Unit,
+//  onExportJson: () -> String,
   modifier: Modifier = Modifier,
   viewModel: MainScreenViewModel = viewModel(factory = MyViewModelProvider.FACTORY),
 ) {
@@ -29,6 +31,11 @@ fun MainScreen(
         onDeviceAdded = { input -> viewModel.addDevice(input) },
         onNavigateToAdd = onNavigateToAdd,
         onDeviceClick = onNavigateToDetail,
+        onExportJson ={
+          runBlocking { viewModel.exportDataAsJson() }
+        }
+
+        ,
         modifier = modifier
       )
     }

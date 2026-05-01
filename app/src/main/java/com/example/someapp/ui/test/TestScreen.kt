@@ -1,6 +1,7 @@
 package com.example.someapp.ui.test
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
@@ -20,11 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import coil3.compose.AsyncImage
 import java.io.File
 
 val fileName = "hello"
-
+private const val TAG = "TestScreen"
 @Composable
 fun TestScreen(modifier: Modifier = Modifier) {
     val dirPath = LocalContext.current.filesDir
@@ -45,17 +47,39 @@ fun TestScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        Log.d(TAG, "TestScreen: $it")
+
+    }
+
     Scaffold() {paddingValues ->
         Column(Modifier.padding(paddingValues)) {
             Text(dirPath.absolutePath)
             if (imageUri != null) {
                 AsyncImage(imageUri, contentDescription = "")
             }
-            AsyncImage("/data/user/0/com.example.someapp/files/hello","some File!")
+//            AsyncImage("/data/user/0/com.example.someapp/files/hello","some File!")
             Button(onClick = {
                 pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             }) {
                 Text("Select Image")
+            }
+
+            Button(onClick = {
+                val uri = imageUri
+
+                val intent = Intent(Intent.ACTION_SEND).apply {
+//                    type = "application/pdf"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+//                context.startActivity(
+//                    Intent.createChooser(intent, "分享文件")
+//                )
+                launcher.launch(Intent.createChooser(intent, "分享文件"))
+            }) {
+                Text("分享")
             }
         }
     }
