@@ -15,6 +15,7 @@ interface DeviceRepository {
     suspend fun insertDevices(devices: List<DeviceEntity>)
     suspend fun updateDevice(device: DeviceEntity)
     suspend fun deleteDevice(device: DeviceEntity)
+    suspend fun deleteDeviceById(id: Long)
 
     fun getAllDeviceTypes(): Flow<List<DeviceTypeEntity>>
     suspend fun getDeviceTypeById(id: Long): DeviceTypeEntity?

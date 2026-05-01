@@ -2,6 +2,7 @@ package com.example.someapp.ui.deviceDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceWithType
 import com.example.someapp.data.repository.DeviceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,12 +21,27 @@ class DeviceDetailViewModel(
   var _uiState: MutableStateFlow<DeviceDetailUiState> = MutableStateFlow(DeviceDetailUiState.Loading);
   val uiState: StateFlow<DeviceDetailUiState> = _uiState.asStateFlow()
 
+  private var currentDeviceId: Long = 0L
+
   fun loadDevice(id: Long) {
+    currentDeviceId = id
     viewModelScope.launch {
-      _uiState.value = DeviceDetailUiState.Success(deviceWithType =  deviceRepository.getAllDevicesWithType().first().find { it.device.id == id } !!)
+      _uiState.value = DeviceDetailUiState.Loading
+      val deviceWithType = deviceRepository.getAllDevicesWithType().first().find { it.device.id == id }
+      _uiState.value = if (deviceWithType != null) {
+        DeviceDetailUiState.Success(deviceWithType)
+      } else {
+        DeviceDetailUiState.NotFound
+      }
     }
   }
 
+  fun deleteDevice(onDeleted: () -> Unit) {
+    viewModelScope.launch {
+      deviceRepository.deleteDeviceById(currentDeviceId)
+      onDeleted()
+    }
+  }
 }
 
 sealed interface DeviceDetailUiState {

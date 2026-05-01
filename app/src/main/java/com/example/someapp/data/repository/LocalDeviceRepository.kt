@@ -38,6 +38,9 @@ class LocalDeviceRepository(
     override suspend fun deleteDevice(device: DeviceEntity) =
         deviceDao.delete(device)
 
+    override suspend fun deleteDeviceById(id: Long) =
+        deviceDao.deleteById(id)
+
     override fun getAllDeviceTypes(): Flow<List<DeviceTypeEntity>> =
         deviceTypeDao.getAll()
 

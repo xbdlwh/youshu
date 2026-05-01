@@ -16,7 +16,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,10 +29,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,11 +61,13 @@ fun DeviceDetailScreen(
   onNavigateToEdit: (DeviceWithType) -> Unit,
   viewModel: DeviceDetailViewModel = viewModel(factory = MyViewModelProvider.FACTORY),
 ) {
-
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  var showDeleteDialog by remember { mutableStateOf(false) }
+
   LaunchedEffect(deviceId) {
     viewModel.loadDevice(deviceId)
   }
+
   Scaffold(
     modifier = modifier,
     topBar = {
@@ -103,6 +113,15 @@ fun DeviceDetailScreen(
       is DeviceDetailUiState.Success -> {
         DeviceDetailContent(
           deviceWithType = state.deviceWithType,
+          onDeleteClick = { showDeleteDialog = true },
+          onConfirmDelete = {
+            showDeleteDialog = false
+            viewModel.deleteDevice {
+              onNavigateBack()
+            }
+          },
+          showDeleteDialog = showDeleteDialog,
+          onDismissDeleteDialog = { showDeleteDialog = false },
           modifier = Modifier.padding(paddingValues)
         )
       }
@@ -113,6 +132,10 @@ fun DeviceDetailScreen(
 @Composable
 private fun DeviceDetailContent(
   deviceWithType: DeviceWithType,
+  onDeleteClick: () -> Unit,
+  onConfirmDelete: () -> Unit,
+  showDeleteDialog: Boolean,
+  onDismissDeleteDialog: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val device = deviceWithType.device
@@ -188,6 +211,51 @@ private fun DeviceDetailContent(
         DetailRow(label = "状态", value = if (device.isServing) "使用中" else "已停用")
       }
     }
+
+    Spacer(Modifier.weight(1f))
+    Spacer(Modifier.height(24.dp))
+
+    // Delete Button
+    Button(
+      onClick = onDeleteClick,
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(56.dp),
+      colors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer
+      )
+    ) {
+      Icon(Icons.Default.Delete, contentDescription = null)
+      Spacer(modifier = Modifier.size(8.dp))
+      Text("Delete Device", style = MaterialTheme.typography.titleMedium)
+    }
+
+    Spacer(Modifier.height(24.dp))
+  }
+
+  // Delete Confirmation Dialog
+  if (showDeleteDialog) {
+    AlertDialog(
+      onDismissRequest = onDismissDeleteDialog,
+      title = { Text("Delete Device") },
+      text = { Text("Are you sure you want to delete \"${device.name}\"? This action cannot be undone.") },
+      confirmButton = {
+        Button(
+          onClick = onConfirmDelete,
+          colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.error
+          )
+        ) {
+          Text("Delete")
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = onDismissDeleteDialog) {
+          Text("Cancel")
+        }
+      }
+    )
   }
 }
 
