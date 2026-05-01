@@ -15,8 +15,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SuggestionChip
-import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -104,11 +102,21 @@ fun DeviceItem(
           StatusBadge(isServing = deviceWithType.device.isServing)
         }
 
-        Text(
-          text = deviceWithType.deviceType.name,
-          style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Row(
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Text(
+            text = deviceWithType.deviceType.name,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+          )
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = "$ownedDays days",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+          )
+        }
 
         Spacer(modifier = Modifier.height(4.dp))
 
@@ -122,9 +130,6 @@ fun DeviceItem(
           InfoChip(
             label = "${dailyCost.currencyText()}/day",
             highlighted = true
-          )
-          InfoChip(
-            label = "${ownedDays}d"
           )
         }
       }
