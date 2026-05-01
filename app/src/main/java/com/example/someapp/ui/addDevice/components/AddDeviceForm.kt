@@ -138,7 +138,7 @@ fun AddDeviceForm(
       modifier = Modifier.fillMaxWidth(),
       enabled = formState.isValid
     ) {
-      Text("Add Device")
+      Text("OK")
     }
   }
 

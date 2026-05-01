@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,12 +35,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.someapp.MyViewModelProvider
 import com.example.someapp.data.local.entity.DeviceEntity
 import com.example.someapp.data.local.entity.DeviceWithType
-import com.example.someapp.data.repository.DeviceRepository
 import java.io.File
 import kotlin.math.max
 
@@ -50,6 +50,7 @@ fun DeviceDetailScreen(
   modifier: Modifier = Modifier,
   deviceId: Long,
   onNavigateBack: () -> Unit,
+  onNavigateToEdit: (DeviceWithType) -> Unit,
   viewModel: DeviceDetailViewModel = viewModel(factory = MyViewModelProvider.FACTORY),
 ) {
 
@@ -65,6 +66,14 @@ fun DeviceDetailScreen(
         navigationIcon = {
           IconButton(onClick = onNavigateBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+          }
+        },
+        actions = {
+          val state = uiState
+          if (state is DeviceDetailUiState.Success) {
+            IconButton(onClick = { onNavigateToEdit(state.deviceWithType) }) {
+              Icon(Icons.Default.Edit, contentDescription = "Edit")
+            }
           }
         }
       )

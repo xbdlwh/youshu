@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +38,7 @@ fun DeviceCategoryList(
   }
 
   Column(modifier = modifier) {
-    PrimaryScrollableTabRow(
+    SecondaryScrollableTabRow (
       selectedTabIndex = selectedTabIndex
     ) {
       categories.forEachIndexed { index, category ->

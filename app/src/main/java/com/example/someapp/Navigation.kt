@@ -13,6 +13,7 @@ import com.example.someapp.ui.main.MainScreen
 import com.example.someapp.ui.addDevice.AddDeviceScreen
 import com.example.someapp.ui.test.TestScreen
 import com.example.someapp.ui.deviceDetail.DeviceDetailScreen
+import com.example.someapp.ui.editDevice.EditDeviceScreen
 
 @Composable
 fun MainNavigation(
@@ -44,6 +45,13 @@ fun MainNavigation(
           DeviceDetailScreen(
             deviceId = key.deviceId,
             onNavigateBack = { backStack.removeLastOrNull() },
+            onNavigateToEdit = { deviceWithType -> backStack.add(EditDevice(deviceWithType)) }
+          )
+        }
+        entry<EditDevice> { key ->
+          EditDeviceScreen(
+            deviceWithType = key.deviceWithType,
+            onNavigateBack = { backStack.removeLastOrNull() }
           )
         }
       },
